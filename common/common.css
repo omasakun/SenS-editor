@@ -1,0 +1,195 @@
+/* 
+# ここでスタイルをしているClass名 
+fullH fullW
+cV cH grow
+scrollX scrollY
+listV hide stock
+cSpace cCenter
+center framed
+# Tag
+h1 button input[type="text"] textarea button.inactive
+*/
+
+* {
+    box-sizing: border-box;
+    position: relative;
+}
+
+body {
+    background-color: #EEE;
+    color: #222;
+    font-family: "Kokoro", "Rounded Mplus 1c", "Open Sans", 'Noto Sans Japanese', "Yu Gothic", "Meiryo UI", sans-serif;
+    font-weight: 300;
+    margin: 0;
+    padding: 0 1em;
+}
+
+.fullH {
+    height: 100% !important;
+}
+
+.fullW {
+    width: 100% !important;
+}
+
+.cV {
+    display: flex;
+    flex-direction: column;
+}
+
+.cH {
+    display: flex;
+    flex-direction: row;
+}
+
+.cV>*,
+.cH>* {
+    flex-shrink: 0;
+}
+
+.grow {
+    flex-grow: 1;
+}
+
+.cWrap {
+    flex-wrap: wrap;
+}
+
+.cCenter {
+    justify-content: center;
+}
+
+.cSpace {
+    justify-content: space-around;
+}
+
+.scrollY {
+    overflow-y: auto;
+}
+
+.scrollX {
+    overflow-x: auto;
+}
+
+.listV {
+    padding-left: 0;
+}
+
+.listV>* {
+    display: block;
+    margin-bottom: 0.2em;
+}
+
+.listH {
+    padding-left: 0;
+    display: inline-block;
+    margin: 0;
+}
+
+.listH>* {
+    display: inline-block;
+    margin-right: 1em;
+}
+
+.hide {
+    display: none;
+}
+
+.stack>* {
+    position: absolute;
+}
+
+.stack>*>* {
+    position: relative;
+}
+
+h1 {
+    display: flex;
+    font-size: 1.5rem;
+    font-weight: inherit;
+    justify-content: flex-start;
+}
+
+h1::before,
+h1::after {
+    background: linear-gradient(transparent 50%, #AAA 50%, #AAA calc(50% + 2px), transparent calc(50% + 2px));
+    content: "";
+    display: inline-block;
+    flex-grow: 1;
+    max-width: 5em;
+}
+
+.center {
+    text-align: center;
+}
+
+.framed {
+    padding: 0 .5em;
+}
+
+h1::before {
+    margin-right: 1em;
+}
+
+h1::after {
+    margin-left: 1em;
+}
+
+input[type="text"],
+button,
+textarea {
+    background-color: transparent;
+    border: none;
+    font: inherit;
+    outline: none;
+    transition: all .1s ease-in-out;
+    border-radius: 0;
+}
+
+input[type="text"] {
+    border-bottom: solid 1px #222;
+    padding-left: .5em;
+}
+
+button {
+    font-weight: bold;
+    padding: 0 .5em;
+    line-height: inherit;
+    cursor: pointer;
+}
+
+textarea {
+    border: solid 1px #222;
+    padding: .5em;
+}
+
+input[type="text"]:hover,
+button:hover,
+textarea:hover,
+.framed:hover {
+    box-shadow: 0 1px 6px -1px #222;
+}
+
+input[type="text"]:hover,
+input[type="text"]:focus {
+    border-bottom: solid 1px transparent;
+}
+
+textarea:hover,
+textarea:focus {
+    border: solid 1px transparent;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    box-shadow: initial;
+}
+
+button:not(.inactive):active {
+    box-shadow: 0 0 2px 0 #222;
+}
+
+button.inactive {
+    color: #AAA;
+    cursor: default;
+}
