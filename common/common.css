@@ -5,9 +5,9 @@ cV cH grow
 scrollX scrollY
 listV hide stock
 cSpace cCenter
-center framed
+center framed framed-block
 # Tag
-h1 button input[type="text"] textarea button.inactive
+h1 button input[type="text"] textarea button.inactive button.noPadding button.hover
 */
 
 * {
@@ -123,6 +123,10 @@ h1::after {
     text-align: center;
 }
 
+.framed-block {
+    padding: .5em .5em;
+}
+
 .framed {
     padding: 0 .5em;
 }
@@ -144,6 +148,7 @@ textarea {
     outline: none;
     transition: all .1s ease-in-out;
     border-radius: 0;
+    line-height: inherit;
 }
 
 input[type="text"] {
@@ -153,11 +158,23 @@ input[type="text"] {
 
 button {
     font-weight: bold;
-    padding: 0 .5em;
     line-height: inherit;
     cursor: pointer;
 }
 
+button {
+    padding: 0 .5em .2em;
+}
+
+button.noPadding {
+    padding: 0 0 .2em;
+}
+button.hover{
+    color:#AAA;
+}
+button:hover:hover{
+    color:inherit;
+}
 textarea {
     border: solid 1px #222;
     padding: .5em;
@@ -166,7 +183,8 @@ textarea {
 input[type="text"]:hover,
 button:hover,
 textarea:hover,
-.framed:hover {
+.framed:hover,
+.framed-block:hover {
     box-shadow: 0 1px 6px -1px #222;
 }
 

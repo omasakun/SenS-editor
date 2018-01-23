@@ -4,24 +4,27 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="description" content="...">
+	<meta name="description" content=".SenS / SenS2 Note Editor">
 	<meta name="author" content="omasakun">
-	<title>...</title>
+	<title>SenS Editor</title>
 	<link rel="stylesheet" href="common/common.css">
 	<script src="common/common.js"></script>
 	<script src="index.js"></script>
 	<style>
-		hr{
-			width:100%;
-			color:#AAA;
+		hr {
+			width: 100%;
+			color: #AAA;
 		}
+
 		html {
 			height: 100%;
 		}
 
 		body {
-			padding: 1em;
+			padding: 0 0.5em;
+			height:100%;
 			line-height: 1.2;
+			overflow: hidden;
 		}
 
 		.max5 {
@@ -33,6 +36,10 @@
 			max-width: 3em;
 			min-width: 1em;
 		}
+
+		.margin-grid {
+			margin: 0 .5em;
+		}
 	</style>
 </head>
 <!-- 
@@ -43,95 +50,52 @@ Canvas canvas
 Span   score-name music-name
 -->
 
-<body class="cV fullH">
+<body class="cV">
 	<!-- something -->
-	<div class="cH cWrap">
-		<div class="framed">Score:
-			<span id="score-name">unselected</span>
-			<button class="icon" id="score-up">file_upload</button>
-			<button class="icon" id="score-down">file_download</button>
-		</div>
-		<div class="grow" style="max-width:5em"></div>
-		<div class="framed">Music:
-			<span id="music-name">unselected</span>
-			<button class="icon" id="music-up">file_upload</button>
-		</div>
-	</div>
-	<hr>
-	<div class="cH cWrap fullW" id="grids">
-		<!--<div class="framed">
-				<span>[&ensp;]</span>
-				<button class="icon">close</button>
-				<span>BPM<input type="text" class="max3"></span>
-				<span>/Offset<input type="text" class="max3"></span>
+	<div>
+		<div class="cH cWrap">
+			<div class="framed">Score:
+				<span id="score-name">unselected</span>
+				<button class="fa fa-upload hover" id="score-up"></button>
+				<button class="fa fa-download hover" id="score-down"></button>
 			</div>
+			<div class="grow" style="max-width:5em"></div>
+			<div class="framed">Music:
+				<span id="music-name">unselected</span>
+				<button class="fa fa-upload hover" id="music-up"></button>
+			</div>
+		</div>
+		<hr>
+		<button class="fa fa-plus-circle" id="grid-add"></button>Grids
+		<div class="cH cWrap fullW" id="grid">
+		</div>
+		<hr>
+		<div class="cH cWrap">
 			<div class="framed">
-				<span>[*]</span>
-				<button class="icon">close</button>
-				<span>BPM<input type="text" class="max3"></span>
-				<span>/Offset<input type="text" class="max3"></span>
-			</div>-->
-		<button class="icon" id="grid-add">add</button>
-	</div>
-	<hr>
-	<div class="cH cWrap">
-		<div class="framed">
-			<input type="text" class="max5" id="ctrl-sec">second</div>
-		<div class="max3 grow"></div>
-		<div class="framed">Window:
-			<input type="text" class="max5" id="ctrl-window">
+				<input type="text" class="max5" id="ctrl-sec">ms
+			</div>
+			<div class="max3 grow"></div>
+			<div class="framed">Window:
+				<input type="text" class="max5" id="ctrl-window">
+			</div>
+			<div class="max3 grow"></div>
+			<div class="framed">Snap-
+				<button id="ctrl-snap">YES</button>
+			</div>
+			<div class="max3 grow"></div>
+			<div class="framed">
+				<input type="text" class="max5" id="ctrl-lanes" value="5">lanes</div>
+			<button id="ctrl-play">PLAY</button>
 		</div>
-		<div class="max3 grow"></div>
-		<div class="framed">Snap-
-			<button id="ctrl-snap">YES</button>
-		</div>
-		<div class="max3 grow"></div>
-		<div class="framed">
-			<input type="text" class="max5" id="ctrl-lanes">lanes</div>
-		<button id="ctrl-play">PLAY</button>
 	</div>
-	<hr>
-	<canvas class="fullW grow" id="canvas"></canvas>
+	<div id="canvas-parent" class="fullW grow">
+		<canvas id="canvas"></canvas>
+	</div>
 	<style>
 		@import url('https://fonts.googleapis.com/earlyaccess/notosansjapanese.css');
 		@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,700');
 		@import url('https://fonts.googleapis.com/earlyaccess/kokoro.css');
 		@import url('https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css');
-		@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-		@font-face {
-			font-family: 'Material Icons';
-			font-style: normal;
-			font-weight: 400;
-			src: url(https://example.com/MaterialIcons-Regular.eot);
-			/* For IE6-8 */
-			src: local('Material Icons'),
-			local('MaterialIcons-Regular'),
-			url(https://example.com/MaterialIcons-Regular.woff2) format('woff2'),
-			url(https://example.com/MaterialIcons-Regular.woff) format('woff'),
-			url(https://example.com/MaterialIcons-Regular.ttf) format('truetype');
-		}
-
-		.icon {
-			font-family: 'Material Icons';
-			font-weight: normal;
-			font-style: normal;
-			font-size: 1em;
-			/*24px; /* Preferred icon size */
-			display: inline-block;
-			line-height: 1.5;
-			text-transform: none;
-			letter-spacing: normal;
-			word-wrap: normal;
-			white-space: nowrap;
-			direction: ltr;
-			/* Support for all WebKit browsers. */
-			-webkit-font-smoothing: antialiased;
-			/* Support for Safari and Chrome. */
-			text-rendering: optimizeLegibility;
-			/* Support for Firefox. */
-			-moz-osx-font-smoothing: grayscale;
-			/* Support for IE. */
-			font-feature-settings: 'liga';
-		}
+		@import url('./font-awesome-4.7.0/css/font-awesome.min.css');
 	</style>
 </body>

@@ -1,0 +1,28 @@
+// 既定の設定とユーザー設定を上書きするには、このファイル内に設定を挿入します
+{
+	"editor.wrappingColumn": 0,
+	"editor.fontFamily": "ricty diminished,consolas, 'Courier New', monospace",
+	"editor.fontSize": 15,
+	"editor.tabSize": 2,
+	"editor.insertSpaces": false,
+	"editor.formatOnType": true,
+	"editor.renderIndentGuides": true,
+	"editor.hideCursorInOverviewRuler": true,
+	"files.autoSave": "off",
+	"typescript.check.tscVersion": false,
+	"window.zoomLevel": 1,
+	"extensions.autoUpdate": true,
+	"editor.useTabStops": true,
+	"editor.tabCompletion": true,
+	"editor.stablePeek": false,
+	"editor.wordWrap": true,
+	"editor.wrappingIndent": "indent",
+	"editor.renderControlCharacters": true,
+	"editor.minimap.enabled": false,
+	"workbench.colorCustomizations": {
+		"editor.background": "#000"
+	},
+	"editor.tokenColorCustomizations": {
+		"comments": "#BDB"
+	}
+}

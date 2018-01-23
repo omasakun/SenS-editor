@@ -4,5 +4,6 @@ declare var Util: {
 	Polyfill: () => void,
 	DateFormat: (date: Date) => string,
 	Download: (fileName: string, text: string) => void,
-	LoadFile: (callBack: (text: string, file: File) => void) => void
+	LoadFileAsText: (callBack: (text: string, file: File) => void) => void,
+	LoadFileAsDataURL: (callBack: (url: string, file: File) => void) => void
 }
