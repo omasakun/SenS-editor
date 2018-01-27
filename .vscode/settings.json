@@ -10,7 +10,7 @@
 	"editor.hideCursorInOverviewRuler": true,
 	"files.autoSave": "off",
 	"typescript.check.tscVersion": false,
-	"window.zoomLevel": 1,
+	"window.zoomLevel": 2,
 	"extensions.autoUpdate": true,
 	"editor.useTabStops": true,
 	"editor.tabCompletion": true,

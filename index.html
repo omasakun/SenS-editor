@@ -22,7 +22,7 @@
 
 		body {
 			padding: 0 0.5em;
-			height:100%;
+			height: 100%;
 			line-height: 1.2;
 			overflow: hidden;
 		}
@@ -64,6 +64,11 @@ Span   score-name music-name
 				<span id="music-name">unselected</span>
 				<button class="fa fa-upload hover" id="music-up"></button>
 			</div>
+			<div class="grow"></div>
+			<div class="framed">
+				■Help:
+			<button class="fa fa-question-circle" id="help"></button>
+			</div>
 		</div>
 		<hr>
 		<button class="fa fa-plus-circle" id="grid-add"></button>Grids
@@ -75,20 +80,75 @@ Span   score-name music-name
 				<input type="text" class="max5" id="ctrl-sec">ms
 			</div>
 			<div class="max3 grow"></div>
+			<div class="framed">Speed:
+				<input type="text" class="max5" id="ctrl-speed">
+			</div>
+			<div class="max3 grow"></div>
 			<div class="framed">Window:
 				<input type="text" class="max5" id="ctrl-window">
 			</div>
 			<div class="max3 grow"></div>
-			<div class="framed">Snap-
+			<div class="framed">Snap:
 				<button id="ctrl-snap">YES</button>
 			</div>
 			<div class="max3 grow"></div>
-			<div class="framed">
-				<input type="text" class="max5" id="ctrl-lanes" value="5">lanes</div>
+			<div class="framed">Note:
+				<button id="ctrl-note-type">Normal</button>
+			</div>
+			<!--<div class="framed hide">
+				<input type="text" class="max5" id="ctrl-lanes" value="5">lanes</div>-->
+			<div class="grow"></div>
 			<button id="ctrl-play">PLAY</button>
 		</div>
 	</div>
-	<div id="canvas-parent" class="fullW grow">
+	<div class="stack" style="z-index: 1">
+		<div style="background-color: rgba(255,255,255,0.8);padding:1em;max-height:calc(100vh - 10em);overflow:auto" class="fullW hide" id="help-doc">
+			<pre>
+==注意==
+- このエディタは、一行目からノーツ定義(「_noteString = "..."」なやつ)が始まっているファイルでないと読み込めない。
+- つまり、一行目にコメントがあったりすると死ぬ(=エラーを吐いて止まる)。
+- これは手抜きではなく、無駄な機能を消した結果だ。僕は悪くない
+- ただし、このヘルプは手抜き。デザインもクソもない。
+
+==目玉機能==
+- 50ms以内の短いスパンでノーツを配置することを禁止
+- SenS2の譜面形式にのみ対応している。SenSの譜面作成は今までの方法を使えばいいと思う。
+- BPM線の追加。これにより、等間隔でのノーツ配置が簡単になりました。
+  タイミングずれを気にする心配も減りました。
+- 曲を入れているフォルダーを移動したりしなくても曲を読み込めるようになりました。
+
+==キーと機能の関係==
+↑: より広い範囲の譜面を表示
+↓: より狭い範囲の譜面を表示
+左: 音楽を100ms遡る
+→: 音楽を100ms進める
+[ : 音楽の再生スピードを速く
+] : 音楽の再生スピードを遅く
+Enter: BPM線に合わせるかどうかを変更
+Space: 音楽の再生、一時停止
+Esc: 曲の終わりを意味するノーツを追加
+QWER: DFJKLのキーで、
+ - Q: ノーツ削除
+ - W: ノーマルノーツ追加
+ - E: チェーンノーツ追加
+ - R: ほるどノーツ追加
+ を行うようなモードにする。
+ 
+==上にあるいろんなやつの機能説明==
+"Score: " の右にある、上矢印が入っているアイコン: 既存の譜面の読み込み
+"Score: " の右にある、下矢印が入っているアイコン: 譜面の保存
+"Music: " の右にある、上矢印が入っているアイコン: 既存の音楽の読み込み
+"⊕Grids"の⊕: BPM線の追加
+"_____ms": 曲のcurrentTime。入力後、Enterを押すと曲の現在時間に適用される。
+"Speed:_____": 曲の再生速度。入力後、Enterを(略)
+"Window:_____": 譜面の表示範囲の変更。これは白い部分の範囲を表している。入力後(ry
+"Snap: YES(NO)": BPM先にノーツをSnapします。入(r
+"Note: ナントカ": ノーツ追加・削除のモード。(r
+"PLAY(PAUSE)": 曲の(r
+			</pre>
+		</div>
+	</div>
+	<div id="canvas-parent" class="fullW grow" style="padding-top:0.5em;">
 		<canvas id="canvas"></canvas>
 	</div>
 	<style>

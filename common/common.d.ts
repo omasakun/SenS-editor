@@ -3,7 +3,7 @@ declare var Util: {
 	URLtoObject: () => any,
 	Polyfill: () => void,
 	DateFormat: (date: Date) => string,
-	Download: (fileName: string, text: string) => void,
+	DownloadText: (fileName: string, text: string) => void,
 	LoadFileAsText: (callBack: (text: string, file: File) => void) => void,
 	LoadFileAsDataURL: (callBack: (url: string, file: File) => void) => void
 }
