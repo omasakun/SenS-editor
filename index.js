@@ -215,7 +215,7 @@ var score = {
     bpms: [],
     score: []
 };
-const _defaultGridBPM = 165;
+const _defaultGridBPM = 120;
 const _defaultGridOffset = 0;
 const minNoteSpan = 50;
 const maxDeleteTimeSpan = 1000;

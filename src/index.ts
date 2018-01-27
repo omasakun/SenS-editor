@@ -2,7 +2,7 @@
 // Up: Window++
 // Down: Window--
 // Left: time--
-// RIght: time++
+// Right: time++
 // [ : Speed++
 // ] : Speed--
 // Enter: Snap
@@ -157,7 +157,7 @@ interface Note {
 	time: [number, number],
 	_: number[]
 } // {type:NoteType.simple,lane:2,time:[-Infinity,Infinity],_:[1000]}
-const ETS = 1000; // ノーツの当り判定の時間。 Editting 判定 Time Span
+const ETS = 1000; // ノーツの当り判定の時間。 Editing 判定 Time Span
 var Note2String = (note: Note): string => {
 	if (note.type == NoteType.simple) return "*:" + note.lane + note._.slice(0, 1).map(v => v << 0).join("|");
 	if (note.type == NoteType.slide) return "+:" + note.lane + note._.slice(0, 1).map(v => v << 0).join("|");
@@ -225,7 +225,7 @@ var score: Score = {
 	bpms: [],
 	score: []
 };
-const _defaultGridBPM = 165; // Ga1ahad120;
+const _defaultGridBPM = 120;
 const _defaultGridOffset = 0;
 const minNoteSpan = 50; // ms
 const maxDeleteTimeSpan = 1000; // ms
@@ -474,7 +474,7 @@ window.addEventListener("load", () => {
 							(<HTMLInputElement>_("ctrl-window")).value = windowSpan.toString();
 						} else if (v.key.keyCode == 37) { // Left: time--
 							audio!.audio.currentTime -= 0.2;
-						} else if (v.key.keyCode == 39) { // RIght: time++
+						} else if (v.key.keyCode == 39) { // Right: time++
 							audio!.audio.currentTime += 0.2;
 						} else if (v.key.keyCode == 221) { // [ : Speed++
 							audio!.audio.playbackRate = Math.max(0, audio!.audio.playbackRate + 0.1);
