@@ -225,7 +225,7 @@ var score: Score = {
 	bpms: [],
 	score: []
 };
-const _defaultGridBPM = 120;
+const _defaultGridBPM = 120; // 165  Ga1ahad
 const _defaultGridOffset = 0;
 const minNoteSpan = 50; // ms
 const maxDeleteTimeSpan = 1000; // ms
@@ -268,7 +268,7 @@ window.addEventListener("load", () => {
 		_("score-down").addEventListener("click", () => {
 			var defaultName = _("score-name").innerText;
 			if (defaultName == "" || defaultName == "unselected") defaultName = "score.js";
-			Util.DownloadText(prompt("File name: ", defaultName) || defaultName, '_noteString = "' + getScore() + '"\n' + new Date().toString());
+			Util.DownloadText(prompt("File name: ", defaultName) || defaultName, '_noteString = "' + getScore() + '"\n//' + new Date().toString());
 		});
 		_("music-up").addEventListener("click", () => {
 			Util.LoadFileAsDataURL((url, file) => {

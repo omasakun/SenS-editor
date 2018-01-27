@@ -252,7 +252,7 @@ window.addEventListener("load", () => {
             var defaultName = _("score-name").innerText;
             if (defaultName == "" || defaultName == "unselected")
                 defaultName = "score.js";
-            Util.DownloadText(prompt("File name: ", defaultName) || defaultName, '_noteString = "' + getScore() + '"\n' + new Date().toString());
+            Util.DownloadText(prompt("File name: ", defaultName) || defaultName, '_noteString = "' + getScore() + '"\n//' + new Date().toString());
         });
         _("music-up").addEventListener("click", () => {
             Util.LoadFileAsDataURL((url, file) => {
