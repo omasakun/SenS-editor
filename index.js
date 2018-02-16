@@ -310,7 +310,6 @@ window.addEventListener("load", () => {
                         if (e.keyCode == 13) {
                             if (!isNaN(parseInt(input1.value))) {
                                 item.bpm = parseInt(input1.value);
-                                item.span = 60000 / item.bpm;
                             }
                             input1.value = item.bpm.toString();
                         }
@@ -433,15 +432,15 @@ window.addEventListener("load", () => {
             var T2Y = (time) => map(time, showingSpace[0], showingSpace[1], 0, 1);
             {
                 for (var bpmID = 0; bpmID < score.bpms.length; bpmID++) {
-                    var bpm = score.bpms[bpmID], tmp = (((showingSpace[1] - bpm.offset) / bpm.span) << 0) * bpm.span + bpm.offset;
+                    var span = 60000 / score.bpms[bpmID].bpm;
+                    var bpm = score.bpms[bpmID], tmp = (((showingSpace[1] - bpm.offset) / span) << 0) * span + bpm.offset;
                     if (!bpm.enable)
                         continue;
-                    while (true) {
-                        var y = T2Y(tmp);
+                    for (let i = 0; true; i++) {
+                        var y = T2Y(tmp + 60000 * i / score.bpms[bpmID].bpm);
                         if (y < 0)
                             break;
                         canvas.line(0, y, 1, y);
-                        tmp += bpm.span;
                     }
                 }
                 canvas.stroke("#CCC");
@@ -449,8 +448,12 @@ window.addEventListener("load", () => {
             {
                 keys.queue.forEach(v => {
                     let snappedTime = now;
-                    if (shouldSnap && score.bpms.length > 0)
-                        snappedTime = score.bpms.filter(v => v.enable).map(v => Math.round((snappedTime - v.offset) / v.span) * v.span + v.offset).sort((a, b) => Math.abs(a) - Math.abs(b))[0];
+                    if (shouldSnap && score.bpms.length > 0) {
+                        snappedTime = score.bpms.filter(v => v.enable).map(v => {
+                            var span = 60000 / v.bpm;
+                            return Math.round((snappedTime - v.offset) / span) * span + v.offset;
+                        }).sort((a, b) => Math.abs(a) - Math.abs(b))[0];
+                    }
                     var lane = LaneKeyCodes.findIndex(vv => vv == v.key.keyCode);
                     if (lane < 0) {
                         if (!v.isDown)
