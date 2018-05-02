@@ -61,6 +61,9 @@ class AudioFromFile {
     setMS(time) { this.audio.currentTime = time / 1000; }
     ;
     isFinished() { return this.finFlag; }
+    playbackRate(v) {
+        this.audio.playbackRate = Math.min(10, Math.max(v, 0.1));
+    }
 }
 class MyCanvas {
     constructor(parent, canvas) {
@@ -188,10 +191,10 @@ var Note2Draw = (note, T2Y) => {
     if (note.type == NoteType.hold) {
         canvas.rect(xMin, Ys[0] - lineHeight / 2, lineWidth, lineHeight);
         if (note._[1] == Infinity) {
-            canvas.rect(xMin + lineWidth / 2, 0, holdNoteLineWidth, Ys[0]);
+            canvas.rect(xMin + lineWidth / 2 - holdNoteLineWidth / 2, 0, holdNoteLineWidth, Ys[0]);
         }
         else {
-            canvas.rect(xMin + lineWidth / 2, Ys[1], holdNoteLineWidth, Ys[0] - Ys[1]);
+            canvas.rect(xMin + lineWidth / 2 - holdNoteLineWidth / 2, Ys[1], holdNoteLineWidth, Ys[0] - Ys[1]);
             canvas.rect(xMin, Ys[1] - lineHeight / 2, lineWidth, lineHeight);
         }
         canvas.fill("#000");
@@ -264,7 +267,6 @@ window.addEventListener("load", () => {
         _("grid-add").addEventListener("click", () => {
             var container = document.createElement("div");
             var item = {
-                span: 60000 / _defaultGridBPM,
                 bpm: _defaultGridBPM,
                 offset: _defaultGridOffset,
                 enable: true
@@ -308,8 +310,8 @@ window.addEventListener("load", () => {
                     span2.appendChild(input1);
                     input1.addEventListener("keyup", (e) => {
                         if (e.keyCode == 13) {
-                            if (!isNaN(parseInt(input1.value))) {
-                                item.bpm = parseInt(input1.value);
+                            if (!isNaN(parseFloat(input1.value))) {
+                                item.bpm = Math.abs(parseFloat(input1.value));
                             }
                             input1.value = item.bpm.toString();
                         }
@@ -328,8 +330,8 @@ window.addEventListener("load", () => {
                     span3.appendChild(input2);
                     input2.addEventListener("keyup", (e) => {
                         if (e.keyCode == 13) {
-                            if (!isNaN(parseInt(input2.value))) {
-                                item.offset = parseInt(input2.value);
+                            if (!isNaN(parseFloat(input2.value))) {
+                                item.offset = parseFloat(input2.value);
                             }
                             input2.value = item.offset.toString();
                         }
@@ -390,7 +392,7 @@ window.addEventListener("load", () => {
                 if (audio) {
                     if (!isNaN(parseFloat(_("ctrl-speed").value))) {
                         var a = audio.audio.paused;
-                        audio.audio.playbackRate = parseFloat(_("ctrl-speed").value);
+                        audio.playbackRate(parseFloat(_("ctrl-speed").value));
                         if (a)
                             audio.pause();
                         else
@@ -407,6 +409,7 @@ window.addEventListener("load", () => {
             if (e.keyCode == 13) {
                 if (!isNaN(parseFloat(_("ctrl-window").value))) {
                     windowSpan = parseFloat(_("ctrl-window").value);
+                    windowSpan = Math.max(windowSpan, 10);
                 }
                 _("ctrl-window").value = windowSpan.toString();
             }
@@ -443,7 +446,9 @@ window.addEventListener("load", () => {
                         canvas.line(0, y, 1, y);
                     }
                 }
-                canvas.stroke("#CCC");
+                canvas.ctx.globalAlpha = 0.25;
+                canvas.stroke("#000");
+                canvas.ctx.globalAlpha = 1;
             }
             {
                 keys.queue.forEach(v => {
@@ -464,6 +469,7 @@ window.addEventListener("load", () => {
                         }
                         else if (v.key.keyCode == 40) {
                             windowSpan -= 100;
+                            windowSpan = Math.max(windowSpan, 10);
                             _("ctrl-window").value = windowSpan.toString();
                         }
                         else if (v.key.keyCode == 37) {
@@ -472,11 +478,11 @@ window.addEventListener("load", () => {
                         else if (v.key.keyCode == 39) {
                             audio.audio.currentTime += 0.2;
                         }
-                        else if (v.key.keyCode == 221) {
-                            audio.audio.playbackRate = Math.max(0, audio.audio.playbackRate + 0.1);
+                        else if (v.key.keyCode == 219) {
+                            audio.playbackRate(audio.audio.playbackRate + 0.1);
                         }
-                        else if (v.key.keyCode == 220) {
-                            audio.audio.playbackRate = Math.max(0, audio.audio.playbackRate - 0.1);
+                        else if (v.key.keyCode == 221) {
+                            audio.playbackRate(audio.audio.playbackRate - 0.1);
                         }
                         if (!v.isFirst)
                             return;

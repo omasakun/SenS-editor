@@ -76,6 +76,9 @@ class AudioFromFile {
 	getMS() { return this.audio.currentTime * 1000; };
 	setMS(time: number) { this.audio.currentTime = time / 1000; };
 	isFinished() { return this.finFlag; }
+	playbackRate(v: number) {
+		this.audio.playbackRate = Math.min(10, Math.max(v, 0.1));
+	}
 }
 // Modified: Fill,Stroke が、Styleを取れるようになった。
 class MyCanvas {
@@ -199,9 +202,9 @@ var Note2Draw = (note: Note, T2Y: (time: number) => number) => {
 	} if (note.type == NoteType.hold) {
 		canvas.rect(xMin, Ys[0] - lineHeight / 2, lineWidth, lineHeight);
 		if (note._[1] == Infinity) {
-			canvas.rect(xMin + lineWidth / 2, 0, holdNoteLineWidth, Ys[0]);
+			canvas.rect(xMin + lineWidth / 2 - holdNoteLineWidth / 2, 0, holdNoteLineWidth, Ys[0]);
 		} else {
-			canvas.rect(xMin + lineWidth / 2, Ys[1], holdNoteLineWidth, Ys[0] - Ys[1]);
+			canvas.rect(xMin + lineWidth / 2 - holdNoteLineWidth / 2, Ys[1], holdNoteLineWidth, Ys[0] - Ys[1]);
 			canvas.rect(xMin, Ys[1] - lineHeight / 2, lineWidth, lineHeight);
 		}
 		canvas.fill("#000");
@@ -280,7 +283,6 @@ window.addEventListener("load", () => {
 		_("grid-add").addEventListener("click", () => {
 			var container = document.createElement("div");
 			var item: Grid = {
-				span: 60000 / _defaultGridBPM, //TODO: 誤差
 				bpm: _defaultGridBPM,
 				offset: _defaultGridOffset,
 				enable: true
@@ -323,8 +325,8 @@ window.addEventListener("load", () => {
 					span2.appendChild(input1);
 					input1.addEventListener("keyup", (e) => {
 						if (e.keyCode == 13) {
-							if (!isNaN(parseInt(input1.value))) {
-								item.bpm = parseInt(input1.value);
+							if (!isNaN(parseFloat(input1.value))) {
+								item.bpm = Math.abs(parseFloat(input1.value));
 							}
 							input1.value = item.bpm.toString();
 						}
@@ -343,8 +345,8 @@ window.addEventListener("load", () => {
 					span3.appendChild(input2);
 					input2.addEventListener("keyup", (e) => {
 						if (e.keyCode == 13) {
-							if (!isNaN(parseInt(input2.value))) {
-								item.offset = parseInt(input2.value);
+							if (!isNaN(parseFloat(input2.value))) {
+								item.offset = parseFloat(input2.value);
 							}
 							input2.value = item.offset.toString();
 						}
@@ -396,7 +398,7 @@ window.addEventListener("load", () => {
 				if (audio) {
 					if (!isNaN(parseFloat((<HTMLInputElement>_("ctrl-speed")).value))) {
 						var a = audio.audio.paused;
-						audio.audio.playbackRate = parseFloat((<HTMLInputElement>_("ctrl-speed")).value);
+						audio.playbackRate(parseFloat((<HTMLInputElement>_("ctrl-speed")).value));
 						if (a) audio.pause();
 						else audio.play();
 					}
@@ -409,6 +411,7 @@ window.addEventListener("load", () => {
 			if (e.keyCode == 13) {
 				if (!isNaN(parseFloat((<HTMLInputElement>_("ctrl-window")).value))) {
 					windowSpan = parseFloat((<HTMLInputElement>_("ctrl-window")).value);
+					windowSpan = Math.max(windowSpan, 10);
 				}
 				(<HTMLInputElement>_("ctrl-window")).value = windowSpan.toString();
 			}
@@ -455,7 +458,9 @@ window.addEventListener("load", () => {
 						canvas.line(0, y, 1, y);
 					}
 				}
-				canvas.stroke("#CCC");
+				canvas.ctx.globalAlpha = 0.25;
+				canvas.stroke("#000");
+				canvas.ctx.globalAlpha = 1;
 			}// BPM線
 			{
 				keys.queue.forEach(v => {
@@ -474,15 +479,16 @@ window.addEventListener("load", () => {
 							(<HTMLInputElement>_("ctrl-window")).value = windowSpan.toString();
 						} else if (v.key.keyCode == 40) { // Down: Window--
 							windowSpan -= 100;
+							windowSpan = Math.max(windowSpan, 10);
 							(<HTMLInputElement>_("ctrl-window")).value = windowSpan.toString();
 						} else if (v.key.keyCode == 37) { // Left: time--
 							audio!.audio.currentTime -= 0.2;
 						} else if (v.key.keyCode == 39) { // Right: time++
 							audio!.audio.currentTime += 0.2;
-						} else if (v.key.keyCode == 221) { // [ : Speed++
-							audio!.audio.playbackRate = Math.max(0, audio!.audio.playbackRate + 0.1);
-						} else if (v.key.keyCode == 220) { // ] : Speed--
-							audio!.audio.playbackRate = Math.max(0, audio!.audio.playbackRate - 0.1);
+						} else if (v.key.keyCode == 219) { // [ : Speed++
+							audio!.playbackRate(audio!.audio.playbackRate + 0.1);
+						} else if (v.key.keyCode == 221) { // ] : Speed--
+							audio!.playbackRate(audio!.audio.playbackRate - 0.1);
 						}
 						if (!v.isFirst) return;
 						if (v.key.keyCode == 13) { // Enter: Snap
