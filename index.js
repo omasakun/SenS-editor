@@ -1,3 +1,4 @@
+window.addEventListener("load", () => Array.from(document.querySelectorAll("button")).forEach(_=>_.addEventListener("keydown",(e)=>e.preventDefault()))); 
 const LaneKeyCodes = "DFJKL".split("").map(v => v.charCodeAt(0));
 const LaneCount = 5;
 function showError(message) {
