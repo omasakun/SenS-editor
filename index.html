@@ -165,7 +165,7 @@ editNotes(fn: (notes: NoteData[]) => NoteData[])
 editNote(fn: (notes: NoteData[]) => NoteData)
   ノーツを編集する関数を渡すと、その通りにノーツを編集します。
   ~使用例~
-  editnotes(notes => {notes.lane=0;return notes}) // すべてのノーツを1レーン目に移動
+  editnote(note => {note.lane=0;return note}) // すべてのノーツを1レーン目に移動
 
 editNoteTime(fn: (time: number) => number)
   ノーツの時間を編集する関数を渡すと、その通りに編集してくれます。
