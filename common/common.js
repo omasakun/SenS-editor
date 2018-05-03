@@ -73,11 +73,12 @@ var Util = {
       if (!file) {
         return;
       }
-      var reader = new FileReader;
+      callBack(URL.createObjectURL(file), file);
+      /*var reader = new FileReader;
       reader.onload = function (e) {
         return callBack(e.target.result, file);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file);*/
     });
     document.body.appendChild(input);
     input.click();

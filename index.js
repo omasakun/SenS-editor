@@ -1,5 +1,5 @@
-window.addEventListener("load", () => Array.from(document.querySelectorAll("button")).forEach(_=>_.addEventListener("keydown",(e)=>e.preventDefault()))); 
-const LaneKeyCodes = "DFJKL".split("").map(v => v.charCodeAt(0));
+window.addEventListener("load", () => Array.from(document.querySelectorAll("button")).forEach(_ => _.addEventListener("keydown", (e) => e.preventDefault())));
+const LaneKeys = "dfjkl".split("");
 const LaneCount = 5;
 function showError(message) {
     console.error(message);
@@ -310,7 +310,7 @@ window.addEventListener("load", () => {
                     input1.setAttribute("class", "max3");
                     span2.appendChild(input1);
                     input1.addEventListener("keyup", (e) => {
-                        if (e.keyCode == 13) {
+                        if (e.key == "Enter") {
                             if (!isNaN(parseFloat(input1.value))) {
                                 item.bpm = Math.abs(parseFloat(input1.value));
                             }
@@ -330,7 +330,7 @@ window.addEventListener("load", () => {
                     input2.setAttribute("class", "max3");
                     span3.appendChild(input2);
                     input2.addEventListener("keyup", (e) => {
-                        if (e.keyCode == 13) {
+                        if (e.key == "Enter") {
                             if (!isNaN(parseFloat(input2.value))) {
                                 item.offset = parseFloat(input2.value);
                             }
@@ -361,7 +361,7 @@ window.addEventListener("load", () => {
         _("ctrl-play").addEventListener("click", () => {
             var text = _("ctrl-play").innerText;
             if (audio) {
-                if (text == "PLAY") {
+                if (audio.audio.paused) {
                     audio.play();
                     _("ctrl-play").innerText = "PAUSE";
                 }
@@ -372,7 +372,7 @@ window.addEventListener("load", () => {
             }
         });
         _("ctrl-sec").addEventListener("keyup", (e) => {
-            if (e.keyCode == 13) {
+            if (e.key == "Enter") {
                 if (audio) {
                     if (!isNaN(parseFloat(_("ctrl-sec").value))) {
                         var a = audio.audio.paused;
@@ -389,7 +389,7 @@ window.addEventListener("load", () => {
             }
         });
         _("ctrl-speed").addEventListener("keyup", (e) => {
-            if (e.keyCode == 13) {
+            if (e.key == "Enter") {
                 if (audio) {
                     if (!isNaN(parseFloat(_("ctrl-speed").value))) {
                         var a = audio.audio.paused;
@@ -407,7 +407,7 @@ window.addEventListener("load", () => {
         });
         _("ctrl-window").value = windowSpan.toString();
         _("ctrl-window").addEventListener("keyup", (e) => {
-            if (e.keyCode == 13) {
+            if (e.key == "Enter") {
                 if (!isNaN(parseFloat(_("ctrl-window").value))) {
                     windowSpan = parseFloat(_("ctrl-window").value);
                     windowSpan = Math.max(windowSpan, 10);
@@ -452,6 +452,12 @@ window.addEventListener("load", () => {
                 canvas.ctx.globalAlpha = 1;
             }
             {
+                if (audio) {
+                    if (audio.audio.paused)
+                        _("ctrl-play").innerText = "PLAY";
+                    else
+                        _("ctrl-play").innerText = "PAUSE";
+                }
                 keys.queue.forEach(v => {
                     let snappedTime = now;
                     if (shouldSnap && score.bpms.length > 0) {
@@ -460,44 +466,44 @@ window.addEventListener("load", () => {
                             return Math.round((snappedTime - v.offset) / span) * span + v.offset;
                         }).sort((a, b) => Math.abs(a) - Math.abs(b))[0];
                     }
-                    var lane = LaneKeyCodes.findIndex(vv => vv == v.key.keyCode);
+                    var lane = LaneKeys.findIndex(vv => vv == v.key.key);
                     if (lane < 0) {
                         if (!v.isDown)
                             return;
-                        if (v.key.keyCode == 38) {
+                        if (v.key.key == "ArrowUp") {
                             windowSpan += 100;
                             _("ctrl-window").value = windowSpan.toString();
                         }
-                        else if (v.key.keyCode == 40) {
+                        else if (v.key.key == "ArrowDown") {
                             windowSpan -= 100;
                             windowSpan = Math.max(windowSpan, 10);
                             _("ctrl-window").value = windowSpan.toString();
                         }
-                        else if (v.key.keyCode == 37) {
+                        else if (v.key.key == "ArrowLeft") {
                             audio.audio.currentTime -= 0.2;
                         }
-                        else if (v.key.keyCode == 39) {
+                        else if (v.key.key == "ArrowRight") {
                             audio.audio.currentTime += 0.2;
                         }
-                        else if (v.key.keyCode == 219) {
+                        else if (v.key.key == "[") {
                             audio.playbackRate(audio.audio.playbackRate + 0.1);
                         }
-                        else if (v.key.keyCode == 221) {
+                        else if (v.key.key == "]") {
                             audio.playbackRate(audio.audio.playbackRate - 0.1);
                         }
                         if (!v.isFirst)
                             return;
-                        if (v.key.keyCode == 13) {
+                        if (v.key.key == "Enter") {
                             shouldSnap = !shouldSnap;
                             if (shouldSnap)
                                 _("ctrl-snap").innerText = "YES";
                             else
                                 _("ctrl-snap").innerText = "NO";
                         }
-                        else if (v.key.keyCode == 32) {
+                        else if (v.key.key == " ") {
                             var text = _("ctrl-play").innerText;
                             if (audio) {
-                                if (text == "PLAY") {
+                                if (audio.audio.paused) {
                                     audio.play();
                                     _("ctrl-play").innerText = "PAUSE";
                                 }
@@ -507,13 +513,13 @@ window.addEventListener("load", () => {
                                 }
                             }
                         }
-                        else if (v.key.keyCode == 27) {
+                        else if (v.key.key == "Escape") {
                             if (score.score.findIndex(v => v.type == NoteType.end) >= 0)
                                 score.score.splice(score.score.findIndex(v => v.type == NoteType.end));
                             score.score.push({ _: [snappedTime], time: [snappedTime, snappedTime], type: NoteType.end });
                         }
-                        else if ([81, 87, 69, 82].findIndex(vv => vv == v.key.keyCode) >= 0) {
-                            noteType = [81, 87, 69, 82].findIndex(vv => vv == v.key.keyCode);
+                        else if ("qwer".split("").findIndex(vv => vv == v.key.key) >= 0) {
+                            noteType = "qwer".split("").findIndex(vv => vv == v.key.key);
                             _("ctrl-note-type").innerText = ["REMOVE", "Normal", "Chain", "Hold", "End"][noteType];
                         }
                         return;
