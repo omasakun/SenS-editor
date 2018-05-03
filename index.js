@@ -6,10 +6,12 @@ function showError(message) {
     alert(message);
     throw message;
 }
-class KeyboardInput {
+class KeyboardOrTapOrClickInput {
     constructor() {
         this.queue = [];
         this.pressed = new Set();
+        this.touches = new Map();
+        this.mouseLane = -1;
         document.body.addEventListener("keydown", (e) => {
             if (this.pressed.has(e.keyCode)) {
                 this.queue.push({
@@ -37,6 +39,120 @@ class KeyboardInput {
                 timeMS: performance.now()
             });
         });
+    }
+    setTapHandler(canvas) {
+        canvas.addEventListener("contextmenu", e => e.preventDefault());
+        canvas.addEventListener("touchstart", e => {
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                var lane = ((e.changedTouches.item(i).clientX - canvas.parentElement.offsetLeft) / (canvas.clientWidth / LaneCount)) << 0;
+                var id = e.changedTouches.item(i).identifier;
+                if (this.touches.has(id))
+                    continue;
+                this.touches.set(id, lane);
+                if (0 <= lane && lane < LaneCount)
+                    this.queue.push({
+                        isFirst: true,
+                        isDown: true,
+                        key: { key: LaneKeys[lane] },
+                        timeMS: performance.now()
+                    });
+            }
+        });
+        canvas.addEventListener("touchmove", e => {
+            e.preventDefault();
+            var tmp = new Set();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                var lane = ((e.changedTouches.item(i).clientX - canvas.parentElement.offsetLeft) / (canvas.clientWidth / LaneCount)) << 0;
+                var id = e.changedTouches.item(i).identifier;
+                var oldLane = this.touches.get(id);
+                if (oldLane == lane)
+                    continue;
+                if (oldLane != undefined)
+                    if (0 <= oldLane && oldLane < LaneCount)
+                        this.queue.push({
+                            isFirst: true,
+                            isDown: false,
+                            key: { key: LaneKeys[oldLane] },
+                            timeMS: performance.now()
+                        });
+                if (0 <= lane && lane < LaneCount)
+                    this.queue.push({
+                        isFirst: true,
+                        isDown: true,
+                        key: { key: LaneKeys[lane] },
+                        timeMS: performance.now()
+                    });
+                this.touches.set(id, lane);
+            }
+        });
+        canvas.addEventListener("touchend", e => {
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                var lane = ((e.changedTouches.item(i).clientX - canvas.parentElement.offsetLeft) / (canvas.clientWidth / LaneCount)) << 0;
+                var id = e.changedTouches.item(i).identifier;
+                if (!this.touches.has(id))
+                    continue;
+                this.touches.delete(id);
+                if (0 <= lane && lane < LaneCount)
+                    this.queue.push({
+                        isFirst: true,
+                        isDown: false,
+                        key: { key: LaneKeys[lane] },
+                        timeMS: performance.now()
+                    });
+            }
+        });
+        canvas.addEventListener("mousedown", e => {
+            e.preventDefault();
+            var lane = ((e.clientX - canvas.parentElement.offsetLeft) / (canvas.clientWidth / LaneCount)) << 0;
+            if (0 <= lane && lane < LaneCount) {
+                this.queue.push({
+                    isFirst: true,
+                    isDown: true,
+                    key: { key: LaneKeys[lane] },
+                    timeMS: performance.now()
+                });
+                this.mouseLane = lane;
+            }
+        });
+        canvas.addEventListener("mousemove", e => {
+            if (e.buttons == 0)
+                return;
+            e.preventDefault();
+            var lane = ((e.clientX - canvas.parentElement.offsetLeft) / (canvas.clientWidth / LaneCount)) << 0;
+            if (this.mouseLane == lane)
+                return;
+            if (0 <= lane && lane < LaneCount) {
+                if (this.mouseLane >= 0)
+                    this.queue.push({
+                        isFirst: true,
+                        isDown: false,
+                        key: { key: LaneKeys[this.mouseLane] },
+                        timeMS: performance.now()
+                    });
+                this.queue.push({
+                    isFirst: true,
+                    isDown: true,
+                    key: { key: LaneKeys[lane] },
+                    timeMS: performance.now()
+                });
+                this.mouseLane = lane;
+            }
+        });
+        canvas.addEventListener("mouseup", e => {
+            e.preventDefault();
+            var lane = ((e.clientX - canvas.parentElement.offsetLeft) / (canvas.clientWidth / LaneCount)) << 0;
+            this.mouseLane = -1;
+            if (0 <= lane && lane < LaneCount)
+                this.queue.push({
+                    isFirst: true,
+                    isDown: false,
+                    key: { key: LaneKeys[lane] },
+                    timeMS: performance.now()
+                });
+        });
+        return this;
     }
     getNowMS() {
         return performance.now();
@@ -141,7 +257,7 @@ var NoteType;
     NoteType[NoteType["hold"] = 3] = "hold";
     NoteType[NoteType["end"] = 4] = "end";
 })(NoteType || (NoteType = {}));
-const ETS = 1000;
+const ETS = 5000;
 var Note2String = (note) => {
     if (note.type == NoteType.simple)
         return "*:" + note.lane + note._.slice(0, 1).map(v => v << 0).join("|");
@@ -234,10 +350,109 @@ function map(value, min1, max1, min2, max2) {
     return (value - min1) / (max1 - min1) * (max2 - min2) + min2;
 }
 function setScore(text) {
-    score.score = text.split(" ").map(v => String2Note(v)).sort((a, b) => a.time[0] - b.time[0]);
+    if (!text.startsWith('_noteString = "')) {
+        showError("譜面、読めない");
+        return;
+    }
+    var lines = text.split("\n");
+    var scoreText = lines[0].trim().substr('_noteString = "'.length).replace('"', "");
+    score.score = scoreText.split(" ").map(v => String2Note(v)).sort((a, b) => a.time[0] - b.time[0]);
+    if (lines.length >= 2 && lines[1].startsWith('_score_options = ')) {
+        var optionText = lines[1].trim().substr('_score_options = '.length);
+        try {
+            var options = JSON.parse(optionText);
+            if ("windowSpan" in options) {
+                windowSpan = options.windowSpan;
+                _("ctrl-window").value = windowSpan.toString();
+            }
+            if ("bpms" in options) {
+                _("grid").innerHTML = "";
+                options.bpms.forEach(_ => {
+                    addBPMGridHTMLElement(_);
+                });
+            }
+        }
+        catch (error) {
+            showError("譜面の読み込みはできたが、オプション(BPM設定等)の読み込みには失敗した。");
+        }
+    }
 }
 function getScore() {
-    return score.score.map(v => Note2String(v)).join(" ");
+    var scoreText = score.score.map(v => Note2String(v)).join(" ");
+    return '_noteString = "' + scoreText + '"\n'
+        + '_score_options = ' + JSON.stringify({ windowSpan: windowSpan, bpms: score.bpms }) + '\n//' + new Date().toString();
+}
+function addBPMGridHTMLElement(item) {
+    var container = document.createElement("div");
+    var itemIndex = score.bpms.length;
+    score.bpms.push(item);
+    container.setAttribute("class", "margin-grid framed");
+    {
+        var removeButton = document.createElement("button");
+        removeButton.setAttribute("class", "fa fa-times-circle noPadding hover");
+        removeButton.addEventListener("click", () => {
+            score.bpms.splice(score.bpms.findIndex(i => i === item), 1);
+            _("grid").removeChild(container);
+        });
+        container.appendChild(removeButton);
+    }
+    {
+        var selectButton = document.createElement("button");
+        selectButton.setAttribute("class", "fa fa-check-square hover");
+        container.appendChild(selectButton);
+        selectButton.addEventListener("click", () => {
+            item.enable = !item.enable;
+            if (item.enable) {
+                selectButton.classList.remove("fa-square");
+                selectButton.classList.add("fa-check-square");
+            }
+            else {
+                selectButton.classList.add("fa-square");
+                selectButton.classList.remove("fa-check-square");
+            }
+        });
+    }
+    {
+        var span2 = document.createElement("span");
+        span2.innerText = "BPM";
+        {
+            var input1 = document.createElement("input");
+            input1.type = "text";
+            input1.value = item.bpm.toString();
+            input1.setAttribute("class", "max3");
+            span2.appendChild(input1);
+            input1.addEventListener("keyup", (e) => {
+                if (e.key == "Enter") {
+                    if (!isNaN(parseFloat(input1.value))) {
+                        item.bpm = Math.abs(parseFloat(input1.value));
+                    }
+                    input1.value = item.bpm.toString();
+                }
+            });
+        }
+        container.appendChild(span2);
+    }
+    {
+        var span3 = document.createElement("span");
+        span3.innerText = "/Offset";
+        {
+            var input2 = document.createElement("input");
+            input2.type = "text";
+            input2.value = item.offset.toString();
+            input2.setAttribute("class", "max3");
+            span3.appendChild(input2);
+            input2.addEventListener("keyup", (e) => {
+                if (e.key == "Enter") {
+                    if (!isNaN(parseFloat(input2.value))) {
+                        item.offset = parseFloat(input2.value);
+                    }
+                    input2.value = item.offset.toString();
+                }
+            });
+        }
+        container.appendChild(span3);
+    }
+    _("grid").appendChild(container);
 }
 window.addEventListener("load", () => {
     {
@@ -245,18 +460,14 @@ window.addEventListener("load", () => {
         _("score-up").addEventListener("click", () => {
             Util.LoadFileAsText((text, file) => {
                 _("score-name").innerText = file.name;
-                if (!text.startsWith('_noteString = "')) {
-                    showError("譜面、読めない");
-                    return;
-                }
-                setScore(text.split("\n")[0].trim().substr('_noteString = "'.length).replace('"', ""));
+                setScore(text);
             });
         });
         _("score-down").addEventListener("click", () => {
             var defaultName = _("score-name").innerText;
             if (defaultName == "" || defaultName == "unselected")
                 defaultName = "score.js";
-            Util.DownloadText(prompt("File name: ", defaultName) || defaultName, '_noteString = "' + getScore() + '"\n//' + new Date().toString());
+            Util.DownloadText(prompt("File name: ", defaultName) || defaultName, getScore());
         });
         _("music-up").addEventListener("click", () => {
             Util.LoadFileAsDataURL((url, file) => {
@@ -266,81 +477,11 @@ window.addEventListener("load", () => {
             });
         });
         _("grid-add").addEventListener("click", () => {
-            var container = document.createElement("div");
-            var item = {
+            addBPMGridHTMLElement({
                 bpm: _defaultGridBPM,
                 offset: _defaultGridOffset,
                 enable: true
-            };
-            var itemIndex = score.bpms.length;
-            score.bpms.push(item);
-            container.setAttribute("class", "margin-grid framed");
-            {
-                var removeButton = document.createElement("button");
-                removeButton.setAttribute("class", "fa fa-times-circle noPadding hover");
-                removeButton.addEventListener("click", () => {
-                    score.bpms.splice(score.bpms.findIndex(i => i === item), 1);
-                    _("grid").removeChild(container);
-                });
-                container.appendChild(removeButton);
-            }
-            {
-                var selectButton = document.createElement("button");
-                selectButton.setAttribute("class", "fa fa-check-square hover");
-                container.appendChild(selectButton);
-                selectButton.addEventListener("click", () => {
-                    item.enable = !item.enable;
-                    if (item.enable) {
-                        selectButton.classList.remove("fa-square");
-                        selectButton.classList.add("fa-check-square");
-                    }
-                    else {
-                        selectButton.classList.add("fa-square");
-                        selectButton.classList.remove("fa-check-square");
-                    }
-                });
-            }
-            {
-                var span2 = document.createElement("span");
-                span2.innerText = "BPM";
-                {
-                    var input1 = document.createElement("input");
-                    input1.type = "text";
-                    input1.value = item.bpm.toString();
-                    input1.setAttribute("class", "max3");
-                    span2.appendChild(input1);
-                    input1.addEventListener("keyup", (e) => {
-                        if (e.key == "Enter") {
-                            if (!isNaN(parseFloat(input1.value))) {
-                                item.bpm = Math.abs(parseFloat(input1.value));
-                            }
-                            input1.value = item.bpm.toString();
-                        }
-                    });
-                }
-                container.appendChild(span2);
-            }
-            {
-                var span3 = document.createElement("span");
-                span3.innerText = "/Offset";
-                {
-                    var input2 = document.createElement("input");
-                    input2.type = "text";
-                    input2.value = item.offset.toString();
-                    input2.setAttribute("class", "max3");
-                    span3.appendChild(input2);
-                    input2.addEventListener("keyup", (e) => {
-                        if (e.key == "Enter") {
-                            if (!isNaN(parseFloat(input2.value))) {
-                                item.offset = parseFloat(input2.value);
-                            }
-                            input2.value = item.offset.toString();
-                        }
-                    });
-                }
-                container.appendChild(span3);
-            }
-            _("grid").appendChild(container);
+            });
         });
         if (shouldSnap)
             _("ctrl-snap").innerText = "YES";
@@ -416,7 +557,8 @@ window.addEventListener("load", () => {
             }
         });
     }
-    keys = new KeyboardInput();
+    keys = new KeyboardOrTapOrClickInput();
+    keys.setTapHandler(_("canvas"));
     canvas = new MyCanvas(_("canvas-parent"), _("canvas"));
     (function Loop() {
         {
@@ -580,3 +722,32 @@ window.addEventListener("load", () => {
         requestAnimationFrame(Loop);
     })();
 });
+function editNotes(fn) {
+    const data = score.score.map(_ => "lane" in _ ? { type: ["tap", "chain", "hold", "end"][_.type - 1], time: _._, lane: _.lane }
+        : { type: ["tap", "chain", "hold", "end"][_.type - 1], time: _._ });
+    data = fn(data);
+    score.score = data.map(note => {
+        if (note.type == "end") {
+            let time = note.time[0];
+            return { type: NoteType.end, time: [time - ETS, time + ETS], _: [time] };
+        }
+        var times = note.time;
+        if (note.type == "tap") {
+            return { type: NoteType.simple, lane: note.lane, time: [times[0] - ETS, times[0] + ETS], _: times.slice(0, 1) };
+        }
+        if (note.type == "chain") {
+            return { type: NoteType.slide, lane: note.lane, time: [times[0] - ETS, times[0] + ETS], _: times.slice(0, 1) };
+        }
+        if (note.type == "hold") {
+            return { type: NoteType.hold, lane: note.lane, time: [times[0] - ETS, times[1] + ETS], _: times.slice(0, 2) };
+        }
+        showError("未定義ノーツ");
+        throw "";
+    }).sort((a, b) => a.time[0] - b.time[0]);
+}
+function editNote(fn) {
+    editNotes(_ => _.map(_ => fn(_)));
+}
+function editNoteTime(fn) {
+    editNote(_ => { _.time = _.time.map(fn); return _; });
+}

@@ -1,46 +1,46 @@
 <!DOCTYPE html>
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="description" content=".SenS / SenS2 Note Editor">
-	<meta name="author" content="omasakun">
-	<title>SenS Editor</title>
-	<link rel="stylesheet" href="common/common.css">
-	<script src="common/common.js"></script>
-	<script src="index.js"></script>
-	<style>
-		hr {
-			width: 100%;
-			color: #AAA;
-		}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="SenS2 Note Editor">
+  <meta name="author" content="omasakun">
+  <title>SenS Editor</title>
+  <link rel="stylesheet" href="common/common.css">
+  <script src="common/common.js"></script>
+  <script src="index.js"></script>
+  <style>
+    hr {
+      width: 100%;
+      color: #AAA;
+    }
 
-		html {
-			height: 100%;
-		}
+    html {
+      height: 100%;
+    }
 
-		body {
-			padding: 0 0.5em;
-			height: 100%;
-			line-height: 1.2;
-			overflow: hidden;
-		}
+    body {
+      padding: 0 0.5em;
+      height: 100%;
+      line-height: 1.2;
+      overflow: hidden;
+    }
 
-		.max5 {
-			max-width: 5em;
-			min-width: 1em;
-		}
+    .max5 {
+      max-width: 5em;
+      min-width: 1em;
+    }
 
-		.max3 {
-			max-width: 3em;
-			min-width: 1em;
-		}
+    .max3 {
+      max-width: 3em;
+      min-width: 1em;
+    }
 
-		.margin-grid {
-			margin: 0 .5em;
-		}
-	</style>
+    .margin-grid {
+      margin: 0 .5em;
+    }
+  </style>
 </head>
 <!-- 
 Button score-up score-down music-up grid-add ctrl-snap ctrl-play
@@ -51,73 +51,80 @@ Span   score-name music-name
 -->
 
 <body class="cV">
-	<!-- something -->
-	<div>
-		<div class="cH cWrap">
-			<div class="framed">Score:
-				<span id="score-name">unselected</span>
-				<button class="fa fa-upload hover" id="score-up"></button>
-				<button class="fa fa-download hover" id="score-down"></button>
-			</div>
-			<div class="grow" style="max-width:5em"></div>
-			<div class="framed">Music:
-				<span id="music-name">unselected</span>
-				<button class="fa fa-upload hover" id="music-up"></button>
-			</div>
-			<div class="grow"></div>
-			<div class="framed">
-				■Help:
-			<button class="fa fa-question-circle" id="help"></button>
-			</div>
-		</div>
-		<hr>
-		<button class="fa fa-plus-circle" id="grid-add"></button>Grids
-		<div class="cH cWrap fullW" id="grid">
-		</div>
-		<hr>
-		<div class="cH cWrap">
-			<div class="framed">
-				<input type="text" class="max5" id="ctrl-sec">ms
-			</div>
-			<div class="max3 grow"></div>
-			<div class="framed">Speed:
-				<input type="text" class="max5" id="ctrl-speed">
-			</div>
-			<div class="max3 grow"></div>
-			<div class="framed">Window:
-				<input type="text" class="max5" id="ctrl-window">
-			</div>
-			<div class="max3 grow"></div>
-			<div class="framed">Snap:
-				<button id="ctrl-snap">YES</button>
-			</div>
-			<div class="max3 grow"></div>
-			<div class="framed">Note:
-				<button id="ctrl-note-type">Normal</button>
-			</div>
-			<!--<div class="framed hide">
-				<input type="text" class="max5" id="ctrl-lanes" value="5">lanes</div>-->
-			<div class="grow"></div>
-			<button id="ctrl-play">PLAY</button>
-		</div>
-	</div>
-	<div class="stack" style="z-index: 1">
-		<div style="background-color: rgba(255,255,255,0.8);padding:1em;max-height:calc(100vh - 10em);overflow:auto" class="fullW hide" id="help-doc">
-			<pre>
-==注意==
+  <!-- something -->
+  <div>
+    <div class="cH cWrap">
+      <div class="framed">Score:
+        <span id="score-name">unselected</span>
+        <button class="fa fa-upload hover" id="score-up"></button>
+        <button class="fa fa-download hover" id="score-down"></button>
+      </div>
+      <div class="grow" style="max-width:5em"></div>
+      <div class="framed">Music:
+        <span id="music-name">unselected</span>
+        <button class="fa fa-upload hover" id="music-up"></button>
+      </div>
+      <div class="grow"></div>
+      <div class="framed">
+        ■Help:
+      <button class="fa fa-question-circle" id="help"></button>
+      </div>
+    </div>
+    <hr>
+    <button class="fa fa-plus-circle" id="grid-add"></button>Grids
+    <div class="cH cWrap fullW" id="grid">
+    </div>
+    <hr>
+    <div class="cH cWrap">
+      <div class="framed">
+        <input type="text" class="max5" id="ctrl-sec">ms
+      </div>
+      <div class="max3 grow"></div>
+      <div class="framed">Speed:
+        <input type="text" class="max5" id="ctrl-speed">
+      </div>
+      <div class="max3 grow"></div>
+      <div class="framed">Window:
+        <input type="text" class="max5" id="ctrl-window">
+      </div>
+      <div class="max3 grow"></div>
+      <div class="framed">Snap:
+        <button id="ctrl-snap">YES</button>
+      </div>
+      <div class="max3 grow"></div>
+      <div class="framed">Note:
+        <button id="ctrl-note-type">Normal</button>
+      </div>
+      <!--<div class="framed hide">
+        <input type="text" class="max5" id="ctrl-lanes" value="5">lanes</div>-->
+      <div class="grow"></div>
+      <button id="ctrl-play">PLAY</button>
+    </div>
+  </div>
+  <div class="stack" style="z-index: 1">
+    <div style="background-color: rgba(255,255,255,0.8);padding:1em;max-height:calc(100vh - 10em);overflow:auto" class="fullW hide" id="help-doc">
+      <pre>
+== 注意 ==
 - このエディタは、一行目からノーツ定義(「_noteString = "..."」なやつ)が始まっているファイルでないと読み込めない。
 - つまり、一行目にコメントがあったりすると死ぬ(=エラーを吐いて止まる)。
 - これは手抜きではなく、無駄な機能を消した結果だ。僕は悪くない
 - ただし、このヘルプは手抜き。デザインもクソもない。
 
-==目玉機能==
+== 2018/05/03 幾つかの更新を行いました ==
+- Tapでも、クリックでもノーツが配置できるようになりました
+- 譜面ファイルを保存するときに、BPM線の設定とwindowSpanの設定を一緒に保存するようになりました。(今までのSenS-editorで作ったファイルも今までどおり読み込めます。安心してください。)
+- あと、幾つかのバグ修正をしました
+- ノーツの内部データをいじれる関数を追加しました！詳しくは下に書いてある、「譜面制作者のための関数」を参照してください。
+- それだけです
+
+== 目玉機能 ==
 - 50ms以内の短いスパンでノーツを配置することを禁止
 - SenS2の譜面形式にのみ対応している。SenSの譜面作成は今までの方法を使えばいいと思う。
 - BPM線の追加。これにより、等間隔でのノーツ配置が簡単になりました。
   タイミングずれを気にする心配も減りました。
 - 曲を入れているフォルダーを移動したりしなくても曲を読み込めるようになりました。
 
-==キーと機能の関係==
+== キーと機能の関係 ==
 ↑: より広い範囲の譜面を表示
 ↓: より狭い範囲の譜面を表示
 左: 音楽を100ms遡る
@@ -134,7 +141,7 @@ QWER: DFJKLのキーで、
  - R: ほるどノーツ追加
  を行うようなモードにする。
  
-==上にあるいろんなやつの機能説明==
+== 上にあるいろんなやつの機能説明 ==
 "Score: " の右にある、上矢印が入っているアイコン: 既存の譜面の読み込み
 "Score: " の右にある、下矢印が入っているアイコン: 譜面の保存
 "Music: " の右にある、上矢印が入っているアイコン: 既存の音楽の読み込み
@@ -145,17 +152,37 @@ QWER: DFJKLのキーで、
 "Snap: YES(NO)": BPM先にノーツをSnapします。入(r
 "Note: ナントカ": ノーツ追加・削除のモード。(r
 "PLAY(PAUSE)": 曲の(r
-			</pre>
-		</div>
-	</div>
-	<div id="canvas-parent" class="fullW grow" style="padding-top:0.5em;">
-		<canvas id="canvas"></canvas>
-	</div>
-	<style>
-		@import url('https://fonts.googleapis.com/earlyaccess/notosansjapanese.css');
-		@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,700');
-		@import url('https://fonts.googleapis.com/earlyaccess/kokoro.css');
-		@import url('https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css');
-		@import url('./font-awesome-4.7.0/css/font-awesome.min.css');
-	</style>
+
+== 譜面制作者のための関数 ==
+以下の関数が用意されています。Consoleに入力してお使いください。
+
+editNotes(fn: (notes: NoteData[]) => NoteData[])
+  ノーツのリストを編集する関数を渡すと、その通りにノーツを編集します。
+  ~使用例~
+  editnotes(notes => []]) // すべてのノーツを削除します
+  editnotes(notes => notes.filter(note => note.type=="end" || note.lane<=4)) // 1~4レーン目にないノーツを削除
+
+editNote(fn: (notes: NoteData[]) => NoteData)
+  ノーツを編集する関数を渡すと、その通りにノーツを編集します。
+  ~使用例~
+  editnotes(notes => {notes.lane=0;return notes}) // すべてのノーツを1レーン目に移動
+
+editNoteTime(fn: (time: number) => number)
+  ノーツの時間を編集する関数を渡すと、その通りに編集してくれます。
+  ~使用例~
+  editNoteTime(time=>time-1000) // すべてのノーツの時間を1000ミリ秒前にする
+  editNoteTime(time=>0) // すべてのノーツの時間を0にする
+</pre>
+    </div>
+  </div>
+  <div id="canvas-parent" class="fullW grow" style="padding-top:0.5em;">
+    <canvas id="canvas"></canvas>
+  </div>
+  <style>
+    @import url('https://fonts.googleapis.com/earlyaccess/notosansjapanese.css');
+    @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,700');
+    @import url('https://fonts.googleapis.com/earlyaccess/kokoro.css');
+    @import url('https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css');
+    @import url('./font-awesome-4.7.0/css/font-awesome.min.css');
+  </style>
 </body>
